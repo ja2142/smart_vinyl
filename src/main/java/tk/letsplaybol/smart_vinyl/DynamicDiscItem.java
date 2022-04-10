@@ -1,4 +1,4 @@
-package com.example.examplemod;
+package tk.letsplaybol.smart_vinyl;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
