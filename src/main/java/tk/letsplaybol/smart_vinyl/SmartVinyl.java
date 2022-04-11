@@ -3,6 +3,12 @@ package tk.letsplaybol.smart_vinyl;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.event.sound.PlaySoundEvent;
+import net.minecraftforge.client.event.sound.PlaySoundSourceEvent;
+import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
+import net.minecraftforge.client.event.sound.SoundLoadEvent;
+import net.minecraftforge.client.event.sound.SoundSetupEvent;
+import net.minecraftforge.client.event.sound.SoundEvent.SoundSourceEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -20,9 +26,10 @@ import org.apache.logging.log4j.Logger;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod("smart_vinyl")
+@Mod(SmartVinyl.MOD_ID)
 public class SmartVinyl
 {
+    public static final String MOD_ID = "smart_vinyl";
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -45,6 +52,7 @@ public class SmartVinyl
         // some preinit code
         LOGGER.info("HELLO FROM PREINIT");
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        SmartVinylPlayPacket.registerPackets();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
@@ -70,6 +78,45 @@ public class SmartVinyl
     public void onServerStarting(FMLServerStartingEvent event) {
         // do something when the server starts
         LOGGER.info("HELLO from server starting");
+    }
+
+    @SubscribeEvent
+    public void onPlaySound(final PlaySoundEvent ev){
+        LOGGER.info("PlaySoundEvent");
+    }
+
+    @SubscribeEvent
+    public void onPlaySoundSource(final PlaySoundSourceEvent ev){
+        LOGGER.info("PlaySoundSourceEvent");
+    }
+
+    @SubscribeEvent
+    public void onPlayStreamingSource(final PlayStreamingSourceEvent event){
+        // runs on jukebox disc insert?
+        LOGGER.info("PlayStreamingSourceEvent " + event.getName() + ", " + event.getSound().toString());
+    }
+
+    /*
+    // breaks mod loading
+    @SubscribeEvent
+    public void onSound(final SoundEvent ev){
+        LOGGER.info("SoundEvent");
+    }*/
+
+    @SubscribeEvent
+    public void onSoundLoad(final SoundLoadEvent ev){
+        LOGGER.info("SoundLoadEvent");
+    }
+
+    @SubscribeEvent
+    public void onSoundSetup(final SoundSetupEvent ev){
+        LOGGER.info("SoundSetupEvent");
+    }
+
+    @SubscribeEvent
+    public void onSoundSource(final SoundSourceEvent event){
+        // runs on jukebox disc insert?
+        LOGGER.info("SoundSourceEvent " + event.getName() + ", " + event.getSound().toString());
     }
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
