@@ -21,15 +21,11 @@ public class AudioStreamMixin {
     @Inject(method = "getStream", at = @At("HEAD"), cancellable = true)
     public void preGetStream(ResourceLocation location, boolean looping,
         CallbackInfoReturnable<CompletableFuture<AudioStreamBuffer>> callback_info){
-        LOGGER.info("====================================");
-        LOGGER.info("getting stream for " + location);
-        LOGGER.info("====================================");
-        if(!location.getNamespace().equals(SmartVinyl.MOD_ID)){
+        if(!location.getNamespace().equals(SmartVinyl.MOD_ID)) {
             return;
         }
-        LOGGER.info("====================================");
-        LOGGER.info("getting stream for " + location);
-        LOGGER.info("====================================");
-
+        LOGGER.debug("====================================");
+        LOGGER.debug("getting stream for " + location);
+        LOGGER.debug("====================================");
     }
 }

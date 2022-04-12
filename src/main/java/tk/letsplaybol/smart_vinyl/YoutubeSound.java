@@ -13,6 +13,7 @@ public class YoutubeSound implements ISound {
     private BlockPos position;
     private Sound sound;
     private ResourceLocation location;
+    private SoundEventAccessor eventAccessor = new SoundEventAccessor(location, null);
 
     public YoutubeSound(BlockPos position, String songName){
         this.position = position;
@@ -32,8 +33,7 @@ public class YoutubeSound implements ISound {
 
     @Override
     public SoundEventAccessor resolve(SoundHandler handler) {
-        // TODO Auto-generated method stub
-        return null;
+        return eventAccessor;
     }
 
     @Override
@@ -53,7 +53,6 @@ public class YoutubeSound implements ISound {
 
     @Override
     public boolean isRelative() {
-        // TODO Auto-generated method stub
         return false;
     }
 
