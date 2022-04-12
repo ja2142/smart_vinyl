@@ -81,36 +81,9 @@ public class SmartVinyl
     }
 
     @SubscribeEvent
-    public void onPlaySound(final PlaySoundEvent ev){
-        LOGGER.info("PlaySoundEvent");
-    }
-
-    @SubscribeEvent
-    public void onPlaySoundSource(final PlaySoundSourceEvent ev){
-        LOGGER.info("PlaySoundSourceEvent");
-    }
-
-    @SubscribeEvent
     public void onPlayStreamingSource(final PlayStreamingSourceEvent event){
         // runs on jukebox disc insert?
         LOGGER.info("PlayStreamingSourceEvent " + event.getName() + ", " + event.getSound().toString());
-    }
-
-    /*
-    // breaks mod loading
-    @SubscribeEvent
-    public void onSound(final SoundEvent ev){
-        LOGGER.info("SoundEvent");
-    }*/
-
-    @SubscribeEvent
-    public void onSoundLoad(final SoundLoadEvent ev){
-        LOGGER.info("SoundLoadEvent");
-    }
-
-    @SubscribeEvent
-    public void onSoundSetup(final SoundSetupEvent ev){
-        LOGGER.info("SoundSetupEvent");
     }
 
     @SubscribeEvent
