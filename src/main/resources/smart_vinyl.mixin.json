@@ -1,0 +1,12 @@
+{
+    "required": true,
+    "package": "tk.letsplaybol.smart_vinyl.mixin",
+    "compatibilityLevel": "JAVA_8",
+    "client": [
+      "AudioStreamMixin"
+    ],
+    "injectors": {
+      "defaultRequire": 1
+    },
+    "refmap": "smart_vinyl.mixin-refmap.json"
+}
