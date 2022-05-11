@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
 import net.minecraftforge.client.event.sound.SoundEvent.SoundSourceEvent;
@@ -46,10 +45,8 @@ public class SmartVinyl
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
         SmartVinylPlayPacket.registerPackets();
+        YoutubeDl.getYoutubeDlBinary();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
