@@ -141,7 +141,19 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    
+    implementation files('dep/velvet-video-0.5.3-SNAPSHOT.jar')
+    // files() is to be changed for something like below, if the velvet fix ever gets merged
+    //implementation "com.github.zakgof:velvet-video:0.5.2"
 
+    implementation "com.github.zakgof:velvet-video-natives:0.2.8.full"
+
+    // dependencies for velvet-video (seems like they aren't considered when using 'implementation files()')
+    // all this is to be removed (except slf4j-api? idk), once official velvet-video version can be used
+    implementation 'commons-io:commons-io:2.6'
+    implementation "com.github.zakgof:tools:0.7.0"
+    implementation 'com.github.jnr:jnr-ffi:2.2.12'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha0'
 }
 
 mixin {

@@ -1,0 +1,6 @@
+the velvet-video jar is velvet video with fix for loading natives on linux, when there are system versions installed
+
+built from:
+
+https://github.com/zakgof/velvet-video/pull/36
+
