@@ -1,16 +1,14 @@
 package tk.letsplaybol.smart_vinyl.util;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class Utf8Coder {
-    private static final Charset utf8 = Charset.forName("UTF-8");
 
     public static byte[] utf8encode(String str){
-        return utf8.encode(str).array();
+        return str.getBytes(StandardCharsets.UTF_8);
     }
 
     public static String utf8decode(byte[] bytes){
-        return utf8.decode(ByteBuffer.wrap(bytes)).toString();
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 }
