@@ -35,14 +35,16 @@ public class AudioStreamVelvet implements IAudioStream {
     private ByteBuffer leftoverSamples;
 
     public AudioStreamVelvet(File file) {
-        this(velvetVideoLib.demuxer(file).audioStream(0));
+        this(velvetVideoLib.demuxer(file));
     }
 
     public AudioStreamVelvet(ISeekableInput input) {
-        this(velvetVideoLib.demuxer(input).audioStream(0));
+        this(velvetVideoLib.demuxer(input));
     }
 
-    private AudioStreamVelvet(IAudioDecoderStream stream) {
+    private AudioStreamVelvet(IDemuxer demuxer) {
+        this.demuxer = demuxer;
+        stream = demuxer.audioStream(0);
         streamIterator = stream.iterator();
 
         unconvertedAudioFormat = stream.properties().format();
