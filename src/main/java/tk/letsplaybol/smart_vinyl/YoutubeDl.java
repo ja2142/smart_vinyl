@@ -2,18 +2,15 @@ package tk.letsplaybol.smart_vinyl;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.zakgof.velvetvideo.ISeekableInput;
 
@@ -22,8 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import net.minecraft.client.renderer.entity.layers.CatCollarLayer;
 
 public class YoutubeDl {
 
@@ -106,17 +101,9 @@ public class YoutubeDl {
         FileBufferedInputStream seekable = new FileBufferedInputStream(connection.getInputStream(),
                 Paths.get(SmartVinyl.MOD_ID, "cache", "downloaded"), connection.getContentLength());
 
-        // TODO async
-        CompletableFuture.runAsync(() -> {
-            try {
-                seekable.download();
-            } catch (IOException e) {
-                LOGGER.error("downloading failed for " + trackName, e);
-            }
-        });
+        seekable.downloadAsync();
 
         return seekable;
-
     }
 
 }

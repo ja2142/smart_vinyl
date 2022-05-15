@@ -7,6 +7,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.concurrent.CompletableFuture;
 
 import com.zakgof.velvetvideo.ISeekableInput;
 
@@ -26,8 +27,12 @@ class FileBufferedInputStream implements ISeekableInput {
     private Object lock;
     private boolean beganConsuming;
 
+    private String downloadName;
+
     public FileBufferedInputStream(InputStream input, Path backingFilePath, int size) throws IOException {
         LOGGER.info("constructor " + backingFilePath);
+
+        downloadName = backingFilePath.toString();
 
         this.input = input;
         this.size = size;
@@ -53,6 +58,16 @@ class FileBufferedInputStream implements ISeekableInput {
         return new FileBufferedInputStream(input, size, writeBuffer, readBuffer.slice(), lock);
     }
 
+    public void downloadAsync(){
+        CompletableFuture.runAsync(() -> {
+            try {
+                download();
+            } catch (IOException e) {
+                LOGGER.error("downloading failed for " + downloadName, e);
+            }
+        });
+    }
+
     // This should be called on a separate producer thread
     public void download() throws IOException {
         if (beganConsuming) {
@@ -72,10 +87,10 @@ class FileBufferedInputStream implements ISeekableInput {
                 lock.notifyAll();
             }
             if (read / READ_BUFFER_SIZE % 100 == 0) {
-                LOGGER.debug("downloaded " + ((double) writeBuffer.position()) / size);
+                LOGGER.debug(downloadName + ": downloaded " + ((double) writeBuffer.position()) / size);
             }
         }
-        LOGGER.info("download finished");
+        LOGGER.info("download finished for " + downloadName);
     }
 
     public int read(byte[] bytes) {
