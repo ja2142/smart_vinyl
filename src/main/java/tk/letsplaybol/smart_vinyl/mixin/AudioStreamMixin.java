@@ -1,5 +1,6 @@
 package tk.letsplaybol.smart_vinyl.mixin;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +15,7 @@ import net.minecraft.client.audio.IAudioStream;
 import net.minecraft.util.ResourceLocation;
 import tk.letsplaybol.smart_vinyl.AudioStreamVelvet;
 import tk.letsplaybol.smart_vinyl.SmartVinyl;
+import tk.letsplaybol.smart_vinyl.YoutubeDl;
 
 @Mixin(AudioStreamManager.class)
 public class AudioStreamMixin {
@@ -21,15 +23,21 @@ public class AudioStreamMixin {
 
     @Inject(method = "getStream", at = @At("HEAD"), cancellable = true)
     public void preGetStream(ResourceLocation location, boolean looping,
-        CallbackInfoReturnable<CompletableFuture<IAudioStream>> callback_info){
-        if(!location.getNamespace().equals(SmartVinyl.MOD_ID)) {
+            CallbackInfoReturnable<CompletableFuture<IAudioStream>> callback_info) {
+        if (!location.getNamespace().equals(SmartVinyl.MOD_ID)) {
             return;
         }
-        LOGGER.debug("====================================");
         LOGGER.debug("getting stream for " + location);
-        LOGGER.debug("====================================");
 
-        CompletableFuture<IAudioStream> future = CompletableFuture.supplyAsync(() -> new AudioStreamVelvet());
+        CompletableFuture<IAudioStream> future = CompletableFuture
+                .supplyAsync(() -> {
+                    try {
+                        return new AudioStreamVelvet(YoutubeDl.getYoutubeStream("Darude - Sandstorm"));
+                    } catch (IOException e) {
+                        LOGGER.debug("failed to get velvet stream for " + location, e);
+                        return null;
+                    }
+                });
         callback_info.setReturnValue(future);
     }
 }
