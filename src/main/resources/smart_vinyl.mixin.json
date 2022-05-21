@@ -3,7 +3,8 @@
     "package": "tk.letsplaybol.smart_vinyl.mixin",
     "compatibilityLevel": "JAVA_8",
     "client": [
-      "AudioStreamMixin"
+      "AudioStreamMixin",
+      "WorldRendererAccess"
     ],
     "injectors": {
       "defaultRequire": 1
