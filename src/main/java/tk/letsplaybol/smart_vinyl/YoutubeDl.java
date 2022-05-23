@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.zakgof.velvetvideo.ISeekableInput;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -83,7 +82,7 @@ public class YoutubeDl {
         return new JsonParser().parse(ytDlOutput).getAsJsonObject();
     }
 
-    public static ISeekableInput getYoutubeStream(String trackName) throws IOException {
+    public static FileBufferedInputStream getYoutubeStream(String trackName) throws IOException {
         JsonObject ytOutputJson = getYoutubeDlOutput(trackName);
 
         LOGGER.info("found " + ytOutputJson.get("title").getAsString());
@@ -100,8 +99,6 @@ public class YoutubeDl {
 
         FileBufferedInputStream seekable = new FileBufferedInputStream(connection.getInputStream(),
                 Paths.get(SmartVinyl.MOD_ID, "cache", "downloaded"), connection.getContentLength());
-
-        seekable.downloadAsync();
 
         return seekable;
     }

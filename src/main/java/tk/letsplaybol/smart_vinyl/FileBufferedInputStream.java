@@ -58,8 +58,8 @@ class FileBufferedInputStream implements ISeekableInput {
         return new FileBufferedInputStream(input, size, writeBuffer, readBuffer.slice(), lock);
     }
 
-    public void downloadAsync(){
-        CompletableFuture.runAsync(() -> {
+    public CompletableFuture<Void> downloadAsync(){
+        return CompletableFuture.runAsync(() -> {
             try {
                 download();
             } catch (IOException e) {

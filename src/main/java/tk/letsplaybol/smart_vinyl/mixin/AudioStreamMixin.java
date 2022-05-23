@@ -1,7 +1,7 @@
 package tk.letsplaybol.smart_vinyl.mixin;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,7 +15,7 @@ import net.minecraft.client.audio.IAudioStream;
 import net.minecraft.util.ResourceLocation;
 import tk.letsplaybol.smart_vinyl.AudioStreamVelvet;
 import tk.letsplaybol.smart_vinyl.SmartVinyl;
-import tk.letsplaybol.smart_vinyl.YoutubeDl;
+import tk.letsplaybol.smart_vinyl.YoutubeCache;
 
 @Mixin(AudioStreamManager.class)
 public class AudioStreamMixin {
@@ -32,8 +32,8 @@ public class AudioStreamMixin {
         CompletableFuture<IAudioStream> future = CompletableFuture
                 .supplyAsync(() -> {
                     try {
-                        return new AudioStreamVelvet(YoutubeDl.getYoutubeStream("Darude - Sandstorm"));
-                    } catch (IOException e) {
+                        return new AudioStreamVelvet(YoutubeCache.cache.getInputStream("Darude - Sandstorm"));
+                    } catch (InterruptedException | ExecutionException e) {
                         LOGGER.debug("failed to get velvet stream for " + location, e);
                         return null;
                     }
