@@ -39,10 +39,6 @@ public class YoutubeCache {
                 return null;
             }
         }));
-
-        // check if file exists and is complete? or have some db for downloaded files
-        // second option seems better, so that it's possible to delete older file
-        // (otherwise this cache could grow out of control)
     }
 
     public ISeekableInput getInputStream(String songName) throws InterruptedException, ExecutionException {
