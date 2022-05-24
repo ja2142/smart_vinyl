@@ -17,6 +17,6 @@ public class ResourceLocationCoder {
         while (locationBase32.length() % 8 != 0) {
             locationBase32 += "=";
         }
-        return Utf8Coder.utf8decode(new Base32().decode(locationBase32.toLowerCase()));
+        return Utf8Coder.utf8decode(new Base32().decode(locationBase32.toUpperCase()));
     }
 }
