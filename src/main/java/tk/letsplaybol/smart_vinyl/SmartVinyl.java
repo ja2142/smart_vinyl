@@ -2,13 +2,13 @@ package tk.letsplaybol.smart_vinyl;
 
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
-import net.minecraftforge.client.event.sound.SoundEvent.SoundSourceEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,8 +23,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(SmartVinyl.MOD_ID)
-public class SmartVinyl
-{
+public class SmartVinyl {
     public static final String MOD_ID = "smart_vinyl";
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
@@ -43,8 +42,13 @@ public class SmartVinyl
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private void setup(final FMLCommonSetupEvent event)
-    {
+    private void silenceVelvetVideo() {
+        Configurator.setLevel("velvet-video", Level.INFO);
+    }
+
+    private void setup(final FMLCommonSetupEvent event) {
+        silenceVelvetVideo();
+
         SmartVinylPlayPacket.registerPackets();
         YoutubeDl.getYoutubeDlBinary();
     }
@@ -54,19 +58,20 @@ public class SmartVinyl
         LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().options);
     }
 
-    private void enqueueIMC(final InterModEnqueueEvent event)
-    {
+    private void enqueueIMC(final InterModEnqueueEvent event) {
         // some example code to dispatch IMC to another mod
-        InterModComms.sendTo("smart_vinyl", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
+        InterModComms.sendTo("smart_vinyl", "helloworld", () -> {
+            LOGGER.info("Hello world from the MDK");
+            return "Hello world";
+        });
     }
 
-    private void processIMC(final InterModProcessEvent event)
-    {
+    private void processIMC(final InterModProcessEvent event) {
         // some example code to receive and process InterModComms from other mods
-        LOGGER.info("Got IMC {}", event.getIMCStream().
-                map(m->m.getMessageSupplier().get()).
-                collect(Collectors.toList()));
+        LOGGER.info("Got IMC {}",
+                event.getIMCStream().map(m -> m.getMessageSupplier().get()).collect(Collectors.toList()));
     }
+
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
@@ -74,21 +79,10 @@ public class SmartVinyl
         LOGGER.info("HELLO from server starting");
     }
 
-    @SubscribeEvent
-    public void onPlayStreamingSource(final PlayStreamingSourceEvent event){
-        // runs on jukebox disc insert?
-        LOGGER.info("PlayStreamingSourceEvent " + event.getName() + ", " + event.getSound().toString());
-    }
-
-    @SubscribeEvent
-    public void onSoundSource(final SoundSourceEvent event){
-        // runs on jukebox disc insert?
-        LOGGER.info("SoundSourceEvent " + event.getName() + ", " + event.getSound().toString());
-    }
-
-    // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
+    // You can use EventBusSubscriber to automatically subscribe events on the
+    // contained class (this is subscribing to the MOD
     // Event bus for receiving Registry Events)
-    @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
@@ -97,8 +91,7 @@ public class SmartVinyl
         }
 
         @SubscribeEvent
-        public static void onItemRegistry(final RegistryEvent.Register<Item> itemRegistryEvent)
-        {
+        public static void onItemRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
             // Register a new block here
             LOGGER.info("registering items");
             itemRegistryEvent.getRegistry().register(new DynamicDiscItem(new Item.Properties()));

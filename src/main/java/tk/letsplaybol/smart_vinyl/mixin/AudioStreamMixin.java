@@ -2,6 +2,8 @@ package tk.letsplaybol.smart_vinyl.mixin;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,10 +18,23 @@ import net.minecraft.util.ResourceLocation;
 import tk.letsplaybol.smart_vinyl.AudioStreamVelvet;
 import tk.letsplaybol.smart_vinyl.SmartVinyl;
 import tk.letsplaybol.smart_vinyl.YoutubeCache;
+import tk.letsplaybol.smart_vinyl.util.ResourceLocationCoder;
 
 @Mixin(AudioStreamManager.class)
 public class AudioStreamMixin {
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private String getOriginalStringFromLocation(ResourceLocation location) {
+        Pattern pattern = Pattern.compile("[a-z0-9]+/([a-z0-9]+)\\..+");
+        Matcher match = pattern.matcher(location.getPath());
+        if (!match.find()) {
+            String problem = "wrong ResourceLocation, expected format: .*/<encoded songname>.<extension>," +
+                " probably sounds/<encoded>.ogg, got: " + location.getPath();
+            LOGGER.error(problem);
+            throw new IllegalArgumentException(problem);
+        }
+        return match.group(1);
+    }
 
     @Inject(method = "getStream", at = @At("HEAD"), cancellable = true)
     public void preGetStream(ResourceLocation location, boolean looping,
@@ -27,12 +42,14 @@ public class AudioStreamMixin {
         if (!location.getNamespace().equals(SmartVinyl.MOD_ID)) {
             return;
         }
-        LOGGER.debug("getting stream for " + location);
+        String origEncoded = getOriginalStringFromLocation(location);
+        String songName = ResourceLocationCoder.locationToString(origEncoded);
+        LOGGER.debug("getting stream for " + location + " (" + songName + ")");
 
         CompletableFuture<IAudioStream> future = CompletableFuture
                 .supplyAsync(() -> {
                     try {
-                        return new AudioStreamVelvet(YoutubeCache.cache.getInputStream("Darude - Sandstorm"));
+                        return new AudioStreamVelvet(YoutubeCache.cache.getInputStream(songName));
                     } catch (InterruptedException | ExecutionException e) {
                         LOGGER.debug("failed to get velvet stream for " + location, e);
                         return null;

@@ -17,6 +17,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import tk.letsplaybol.smart_vinyl.mixin.WorldRendererAccess;
+import tk.letsplaybol.smart_vinyl.util.ResourceLocationCoder;
 import tk.letsplaybol.smart_vinyl.util.Utf8Coder;
 
 public class SmartVinylPlayPacket {
@@ -84,7 +85,7 @@ public class SmartVinylPlayPacket {
 
         minecraft.gui.setNowPlaying(new StringTextComponent(songName));
 
-        ISound sound = new YoutubeSound(message.pos, "521521");
+        ISound sound = new YoutubeSound(message.pos, ResourceLocationCoder.stringToLocation(songName));
         minecraft.getSoundManager().play(sound);
         renderer.getPlayingRecords().put(position, sound);
 

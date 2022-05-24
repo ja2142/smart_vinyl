@@ -98,7 +98,7 @@ public class YoutubeDl {
         }
 
         FileBufferedInputStream seekable = new FileBufferedInputStream(connection.getInputStream(),
-                Paths.get(SmartVinyl.MOD_ID, "cache", "downloaded"), connection.getContentLength());
+                Paths.get(SmartVinyl.MOD_ID, "cache", trackName), connection.getContentLength());
 
         return seekable;
     }

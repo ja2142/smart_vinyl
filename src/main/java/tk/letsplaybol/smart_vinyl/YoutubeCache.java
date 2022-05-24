@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.xml.bind.DatatypeConverter;
+
 import com.zakgof.velvetvideo.ISeekableInput;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,8 +23,7 @@ public class YoutubeCache {
     private Map<String, FileBufferedInputStream> startedDownloads = new HashMap<>();
     private Map<String, FileBufferedInputStream> finishedDownloads = new HashMap<>();
 
-    // TODO locking
-    public void startDownload(String songName) {
+    public synchronized void startDownload(String songName) {
         if (startedLookups.containsKey(songName) || startedDownloads.containsKey(songName)
                 || finishedDownloads.containsKey(songName)) {
             LOGGER.debug("download for " + songName + " already started");
@@ -41,7 +42,7 @@ public class YoutubeCache {
         }));
     }
 
-    public ISeekableInput getInputStream(String songName) throws InterruptedException, ExecutionException {
+    public synchronized ISeekableInput getInputStream(String songName) throws InterruptedException, ExecutionException {
         LOGGER.debug("getting stream for " + songName);
         if (finishedDownloads.containsKey(songName)) {
             LOGGER.debug(songName + " already downloaded");

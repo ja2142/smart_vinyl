@@ -26,6 +26,11 @@ public class DynamicDiscItem extends Item {
         SmartVinylPlayPacket.NETWORK_CHANNEL.send(PacketDistributor.ALL.noArg(), new SmartVinylPlayPacket(position, songName));
     }
 
+    private String getRealDisplayName(ItemStack stack){
+        String nameInBrackets = stack.getDisplayName().getString();
+        return nameInBrackets.substring(1, nameInBrackets.length() - 1);
+    }
+
     @Override
     public ActionResultType useOn(ItemUseContext context) {
         World level = context.getLevel();
@@ -37,8 +42,7 @@ public class DynamicDiscItem extends Item {
                 JukeboxBlock jukebox = (JukeboxBlock)usedOnBlockState.getBlock();
                 jukebox.setRecord(level, clickedPos, usedOnBlockState, recordStack);
 
-                // TODO actually play sound
-                playSound(clickedPos, "Darude - Sandstorm");
+                playSound(clickedPos, getRealDisplayName(context.getItemInHand()));
 
                 recordStack.shrink(1);
 

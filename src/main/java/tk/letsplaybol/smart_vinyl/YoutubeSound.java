@@ -13,11 +13,12 @@ public class YoutubeSound implements ISound {
     private BlockPos position;
     private Sound sound;
     private ResourceLocation location;
-    private SoundEventAccessor eventAccessor = new SoundEventAccessor(location, null);
+    private SoundEventAccessor eventAccessor;
 
     public YoutubeSound(BlockPos position, String songName){
         this.position = position;
         location = new ResourceLocation(SmartVinyl.MOD_ID, songName);
+        eventAccessor = new SoundEventAccessor(location, null);
         sound = new Sound(location.toString(),
             getVolume(), getPitch(), getWeight(),
             Sound.Type.SOUND_EVENT,
