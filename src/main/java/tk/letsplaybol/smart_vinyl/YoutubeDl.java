@@ -19,6 +19,8 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import tk.letsplaybol.smart_vinyl.util.ResourceLocationCoder;
+
 public class YoutubeDl {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -98,7 +100,8 @@ public class YoutubeDl {
         }
 
         FileBufferedInputStream seekable = new FileBufferedInputStream(connection.getInputStream(),
-                Paths.get(SmartVinyl.MOD_ID, "cache", trackName), connection.getContentLength());
+                Paths.get(SmartVinyl.MOD_ID, "cache", ResourceLocationCoder.stringToLocation(trackName)),
+                connection.getContentLength());
 
         return seekable;
     }
