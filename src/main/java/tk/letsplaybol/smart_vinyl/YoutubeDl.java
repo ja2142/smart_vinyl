@@ -61,16 +61,13 @@ public class YoutubeDl {
 
     public static String runCommand(String... args) throws IOException {
         Process proc = Runtime.getRuntime().exec(args);
-        try {
-            proc.waitFor();
-        } catch (InterruptedException e) {
-        }
+        String output = IOUtils.toString(proc.getInputStream(), StandardCharsets.UTF_8);
         if (proc.exitValue() != 0) {
             String error = IOUtils.toString(proc.getErrorStream(), StandardCharsets.UTF_8);
             LOGGER.error("youtube-dl failed with: " + error);
             throw new IOException(error);
         }
-        return IOUtils.toString(proc.getInputStream(), StandardCharsets.UTF_8);
+        return output;
     }
 
     public static JsonObject getYoutubeDlOutput(String trackName) throws IOException {
