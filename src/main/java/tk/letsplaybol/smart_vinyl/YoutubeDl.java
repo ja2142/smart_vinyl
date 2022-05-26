@@ -62,6 +62,11 @@ public class YoutubeDl {
     public static String runCommand(String... args) throws IOException {
         Process proc = Runtime.getRuntime().exec(args);
         String output = IOUtils.toString(proc.getInputStream(), StandardCharsets.UTF_8);
+        try{
+            proc.waitFor();
+        } catch(InterruptedException e){
+            throw new IOException(e);
+        }
         if (proc.exitValue() != 0) {
             String error = IOUtils.toString(proc.getErrorStream(), StandardCharsets.UTF_8);
             LOGGER.error("youtube-dl failed with: " + error);
