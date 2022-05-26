@@ -42,28 +42,37 @@ public class YoutubeCache {
         }));
     }
 
-    public synchronized ISeekableInput getInputStream(String songName) throws InterruptedException, ExecutionException {
+    public ISeekableInput getInputStream(String songName) throws InterruptedException, ExecutionException {
         LOGGER.debug("getting stream for " + songName);
-        if (finishedDownloads.containsKey(songName)) {
-            LOGGER.debug(songName + " already downloaded");
-            // TODO to also make files downloaded in other sessions work, there has to be
-            // some conversion from File to ISeekableInput
-            return finishedDownloads.get(songName).slice();
+        Future<FileBufferedInputStream> streamFuture;
+        synchronized (this) {
+            if (finishedDownloads.containsKey(songName)) {
+                LOGGER.debug(songName + " already downloaded");
+                // TODO to also make files downloaded in other sessions work, there has to be
+                // some conversion from File to ISeekableInput
+                return finishedDownloads.get(songName).slice();
+            }
+
+            if (startedDownloads.containsKey(songName)) {
+                LOGGER.debug(songName + " download already started");
+                return startedDownloads.get(songName).slice();
+            }
+
+            if (!startedLookups.containsKey(songName)) {
+                LOGGER.debug(songName + " lookup not started yet, starting");
+                startDownload(songName);
+            }
+
+            streamFuture = startedLookups.get(songName);
         }
 
-        if (startedDownloads.containsKey(songName)) {
-            LOGGER.debug(songName + " download already started");
-            return startedDownloads.get(songName).slice();
+        LOGGER.debug("waiting for " + songName);
+        FileBufferedInputStream input = streamFuture.get();
+        LOGGER.debug("done waiting");
+
+        synchronized(this){
+            startedDownloads.put(songName, input);
         }
-
-        if (!startedLookups.containsKey(songName)) {
-            LOGGER.debug(songName + " lookup not started yet, starting");
-            startDownload(songName);
-        }
-
-        FileBufferedInputStream input = startedLookups.get(songName).get();
-
-        startedDownloads.put(songName, input);
         input.downloadAsync().thenRun(() -> {
             downloadCompleted(songName);
         });
