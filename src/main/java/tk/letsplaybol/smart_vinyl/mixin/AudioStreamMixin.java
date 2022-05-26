@@ -51,7 +51,7 @@ public class AudioStreamMixin {
                     try {
                         return new AudioStreamVelvet(YoutubeCache.cache.getInputStream(songName));
                     } catch (InterruptedException | ExecutionException e) {
-                        LOGGER.debug("failed to get velvet stream for " + location, e);
+                        LOGGER.error("failed to get velvet stream for " + location, e);
                         return null;
                     }
                 });
