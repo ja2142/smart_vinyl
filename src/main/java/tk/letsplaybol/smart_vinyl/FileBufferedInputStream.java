@@ -58,7 +58,7 @@ class FileBufferedInputStream implements ISeekableInput {
         return new FileBufferedInputStream(input, size, writeBuffer, readBuffer.slice(), lock);
     }
 
-    public CompletableFuture<Void> downloadAsync(){
+    public CompletableFuture<Void> downloadAsync() {
         return CompletableFuture.runAsync(() -> {
             try {
                 download();
@@ -79,17 +79,22 @@ class FileBufferedInputStream implements ISeekableInput {
         int len = input.read(buf);
         int read = 0;
 
-        while (len != -1) {
-            synchronized (lock) {
-                read += len;
-                writeBuffer.put(buf, 0, len);
-                len = input.read(buf);
-                lock.notifyAll();
+        try {
+            while (len != -1) {
+                synchronized (lock) {
+                    read += len;
+                    writeBuffer.put(buf, 0, len);
+                    len = input.read(buf);
+                    lock.notifyAll();
+                }
+                if (read / READ_BUFFER_SIZE % 100 == 0) {
+                    LOGGER.debug(downloadName + ": downloaded " + ((double) writeBuffer.position()) / size);
+                }
             }
-            if (read / READ_BUFFER_SIZE % 100 == 0) {
-                LOGGER.debug(downloadName + ": downloaded " + ((double) writeBuffer.position()) / size);
-            }
+        } finally {
+            input.close();
         }
+
         LOGGER.info("download finished for " + downloadName);
     }
 
@@ -133,10 +138,7 @@ class FileBufferedInputStream implements ISeekableInput {
     }
 
     public void close() {
-        try {
-            input.close();
-        } catch (IOException e) {
-        }
+        // inputStream closed in download instead
     }
 
     public void seek(long position) {
