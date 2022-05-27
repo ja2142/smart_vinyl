@@ -3,6 +3,7 @@ package tk.letsplaybol.smart_vinyl;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Iterator;
 
 import javax.sound.sampled.AudioFormat;
@@ -31,19 +32,29 @@ public class AudioStreamVelvet implements IAudioStream {
     private AudioFormat convertedAudioFormat;
 
     private boolean downsizingSamples = false;
+    private boolean monoingSamples = false;
 
     private ByteBuffer leftoverSamples;
 
     public AudioStreamVelvet(File file) {
-        this(velvetVideoLib.demuxer(file));
+        this(file, false);
+    }
+
+    public AudioStreamVelvet(File file, boolean convertToMono) {
+        this(velvetVideoLib.demuxer(file), convertToMono);
     }
 
     public AudioStreamVelvet(ISeekableInput input) {
-        this(velvetVideoLib.demuxer(input));
+        this(input, false);
     }
 
-    private AudioStreamVelvet(IDemuxer demuxer) {
+    public AudioStreamVelvet(ISeekableInput input, boolean convertToMono) {
+        this(velvetVideoLib.demuxer(input), convertToMono);
+    }
+
+    private AudioStreamVelvet(IDemuxer demuxer, boolean convertToMono) {
         this.demuxer = demuxer;
+        this.monoingSamples = convertToMono;
         stream = demuxer.audioStream(0);
         streamIterator = stream.iterator();
 
@@ -52,20 +63,25 @@ public class AudioStreamVelvet implements IAudioStream {
             throw new UnsupportedOperationException(
                     "only signed pcm audio implemented, was " + unconvertedAudioFormat.getEncoding());
         }
+        if (unconvertedAudioFormat.getChannels() != 2) {
+            throw new UnsupportedOperationException(
+                    "only stereo audio input implemented, channel count was " + unconvertedAudioFormat.getChannels());
+        }
 
         if (unconvertedAudioFormat.getSampleSizeInBits() <= 16) {
             convertedAudioFormat = unconvertedAudioFormat;
         } else if (unconvertedAudioFormat.getSampleSizeInBits() == 32) {
             // resize samples 32 -> 16 (minecraft doesn't seem to accept 32 bit samples)
             downsizingSamples = true;
-            int converted_sample_size_bits = 16;
-            int converted_frame_size = 2 * unconvertedAudioFormat.getChannels();
+            int convertedSampleSizeBits = 16;
+            int convertedFrameSize = 2 * unconvertedAudioFormat.getChannels();
+            int convertedChannels = monoingSamples ? 1 : 2;
             convertedAudioFormat = new AudioFormat(
                     unconvertedAudioFormat.getEncoding(),
                     unconvertedAudioFormat.getSampleRate(),
-                    converted_sample_size_bits,
-                    unconvertedAudioFormat.getChannels(),
-                    converted_frame_size,
+                    convertedSampleSizeBits,
+                    convertedChannels,
+                    convertedFrameSize,
                     unconvertedAudioFormat.getFrameRate(),
                     unconvertedAudioFormat.isBigEndian());
         } else {
@@ -152,22 +168,41 @@ public class AudioStreamVelvet implements IAudioStream {
     // it'd be better if it was possible to ask velvet a specified format, but this
     // doesn't seem to be possible
     private int downsizeSamples(byte[] samples) {
-        if (!downsizingSamples) {
+        if (!downsizingSamples && !monoingSamples) {
             return samples.length;
         }
-        int inputSizeBytes = unconvertedAudioFormat.getSampleSizeInBits() / 8;
-        // most significant bytes are first two of an int if buffer is big endian, and
-        // last two if it's little
-        // thare's likely some better, more abstract way to do this, probably ByteBuffer
-        // based, but I can't be bothered to redo that right now
-        int msbOffset = unconvertedAudioFormat.isBigEndian() ? 0 : 2;
 
-        for (int i = 0; i < samples.length / inputSizeBytes; i++) {
-            int sample32MsbOffset = i * 4 + msbOffset;
-            int sample16Offset = i * 2;
-            samples[sample16Offset] = samples[sample32MsbOffset];
-            samples[sample16Offset + 1] = samples[sample32MsbOffset + 1];
+        ByteBuffer readBuff = ByteBuffer.wrap(samples);
+        ByteBuffer writeBuff = ByteBuffer.wrap(samples);
+        readBuff.order(unconvertedAudioFormat.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
+        writeBuff.order(convertedAudioFormat.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
+        int sample0, sample1;
+
+        int inputSizeBytes = unconvertedAudioFormat.getSampleSizeInBits() / 8;
+
+        while (readBuff.remaining() >= inputSizeBytes * 2) {
+            if (downsizingSamples) {
+                sample0 = readBuff.getInt() >> 16;
+                sample1 = readBuff.getInt() >> 16;
+            } else {
+                sample0 = readBuff.getShort();
+                sample1 = readBuff.getShort();
+            }
+
+            if (monoingSamples) {
+                writeBuff.putShort((short) ((sample0 + sample1) >> 1));
+            } else {
+                writeBuff.putShort((short) sample0);
+                writeBuff.putShort((short) sample1);
+            }
         }
-        return samples.length / 2;
+        int resultLength = samples.length;
+        if (downsizingSamples){
+            resultLength /= 2;
+        }
+        if(monoingSamples){
+            resultLength /= 2;
+        }
+        return resultLength;
     }
 }
