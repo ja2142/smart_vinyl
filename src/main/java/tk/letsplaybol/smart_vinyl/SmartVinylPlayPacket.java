@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.mixin.MixinEnvironment.Side;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
@@ -12,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -69,6 +71,7 @@ public class SmartVinylPlayPacket {
         context.get().setPacketHandled(true);
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static void do_handle(SmartVinylPlayPacket message, Supplier<NetworkEvent.Context> context) {
         Minecraft minecraft = Minecraft.getInstance();
         WorldRendererAccess renderer = (WorldRendererAccess) minecraft.levelRenderer;
