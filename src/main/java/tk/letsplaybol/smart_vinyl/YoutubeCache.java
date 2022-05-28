@@ -49,7 +49,7 @@ public class YoutubeCache {
             try {
                 return YoutubeDl.getYoutubeStream(songName);
             } catch (IOException e) {
-                LOGGER.debug("lookup failed", e);
+                LOGGER.error("lookup failed", e);
                 return null;
             }
         }));
