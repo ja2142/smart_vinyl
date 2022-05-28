@@ -147,7 +147,9 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    
+
+    implementation 'org.xerial:sqlite-jdbc:3.36.0'
+
     implementation files('dep/velvet-video-0.5.3-SNAPSHOT.jar')
     // files() is to be changed for something like below, if the velvet fix ever gets merged
     //implementation "com.github.zakgof:velvet-video:0.5.2"
