@@ -44,14 +44,3 @@ Community Documentation: http://mcforge.readthedocs.io/en/latest/gettingstarted/
 LexManos' Install Video: https://www.youtube.com/watch?v=8VEdtQLuLO0  
 Forge Forum: https://forums.minecraftforge.net/  
 Forge Discord: https://discord.gg/UvedJ9m  
-
-apparently forge for 1.16.5 needs java 1.8, but <1.8.322 for some reason? 312 seems to working
-https://forums.minecraftforge.net/topic/108247-forge-1165-not-working-fixed/
-
-yay -R jdk8-openjdk
-yay -R jre8-openjdk
-yay -U https://archive.archlinux.org/packages/j/jdk8-openjdk/jdk8-openjdk-8.u312-2-x86_64.pkg.tar.zst
-yay -U https://archive.archlinux.org/packages/j/jre8-openjdk/jre8-openjdk-8.u312-2-x86_64.pkg.tar.zst
-yay -U https://archive.archlinux.org/packages/j/jre8-openjdk-headless/jre8-openjdk-headless-8.u312-2-x86_64.pkg.tar.zst
-pretty barbaric, but works
-
