@@ -1,5 +1,6 @@
 package tk.letsplaybol.smart_vinyl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -28,6 +29,19 @@ class FileBufferedInputStream implements ISeekableInput {
     private boolean beganConsuming;
 
     private String downloadName;
+
+    // make stream from already downloaded file
+    public FileBufferedInputStream(Path backingFilePath) throws IOException {
+        LOGGER.info("constructor " + backingFilePath);
+
+        this.size = (int)backingFilePath.toFile().length();
+        this.readBuffer = FileChannel.open(backingFilePath, StandardOpenOption.READ)
+                .map(MapMode.READ_ONLY, 0, size);
+        // writeBuffer in this case is not used for writing, it's just to emulate other mode of operation
+        this.writeBuffer = readBuffer.slice();
+        // emulate already written file
+        writeBuffer.position(size);
+    }
 
     public FileBufferedInputStream(InputStream input, Path backingFilePath, int size) throws IOException {
         LOGGER.info("constructor " + backingFilePath);

@@ -91,11 +91,12 @@ public class CacheDb implements Closeable {
         return lruRecord;
     }
 
-    public void add(String songName, int size) {
+    public void add(String songName, long size) {
         try (PreparedStatement statement = connection
-                .prepareStatement("insert into streams (song_name, last_used, size) values (?, strftime('%s','now'), ?)");) {
+                .prepareStatement("insert into streams (song_name, last_used, size) values (?, strftime('%s','now'), ?)"
+                        + " on conflict(song_name) do update set last_used=excluded.last_used, size=excluded.size");) {
             statement.setString(1, songName);
-            statement.setInt(2, size);
+            statement.setLong(2, size);
             statement.execute();
         } catch (SQLException e) {
             LOGGER.error("adding entry failed", e);
@@ -105,7 +106,7 @@ public class CacheDb implements Closeable {
     private void createDb() {
         try (Statement createStatement = connection.createStatement()) {
             createStatement.execute(
-                    "create table if not exists streams(id integer primary key autoincrement, song_name text, last_used int, size int)");
+                    "create table if not exists streams(id integer primary key autoincrement, song_name text unique, last_used int, size int)");
         } catch (SQLException e) {
             LOGGER.error("creating db failed", e);
         }

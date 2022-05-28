@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -102,7 +101,7 @@ public class YoutubeDl {
         }
 
         FileBufferedInputStream seekable = new FileBufferedInputStream(connection.getInputStream(),
-                Paths.get(SmartVinyl.MOD_ID, "cache", ResourceLocationCoder.stringToLocation(trackName)),
+                ResourceLocationCoder.getTrackPath(trackName),
                 connection.getContentLength());
 
         return seekable;
