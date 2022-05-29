@@ -14,6 +14,9 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
+repositories {
+    mavenCentral()
+}
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
@@ -195,6 +198,14 @@ jar.dependsOn('shadowJar')
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
+    // from configurations.shade.collect { it.isDirectory() ? it : zipTree(it) }
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)) {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     manifest {
         attributes([
             "Specification-Title": "smart_vinyl",
@@ -217,6 +228,10 @@ jar.finalizedBy('reobfJar')
 shadowJar.finalizedBy('reobfJar')
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 publish.dependsOn('reobfJar')
+
+// reobfJar {
+//     input.set(shadowJar.archivePath)
+// }
 
 publishing {
     publications {
