@@ -52,7 +52,7 @@ public class SmartVinyl {
         SmartVinylPlayPacket.registerPackets();
         YoutubeDl.getYoutubeDlBinary();
 
-        YoutubeCache.cache.cleanup();
+        YoutubeCache.getCache().cleanup();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {

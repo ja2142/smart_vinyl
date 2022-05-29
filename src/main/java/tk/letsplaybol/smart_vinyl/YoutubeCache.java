@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import tk.letsplaybol.smart_vinyl.util.ResourceLocationCoder;
 
 public class YoutubeCache {
-    public static YoutubeCache cache = new YoutubeCache();
+    public static YoutubeCache instance;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -27,6 +27,13 @@ public class YoutubeCache {
 
     private Map<String, Future<FileBufferedInputStream>> startedLookups = new HashMap<>();
     private Map<String, FileBufferedInputStream> startedDownloads = new HashMap<>();
+
+    public static YoutubeCache getCache() {
+        if (instance == null) {
+            instance = new YoutubeCache();
+        }
+        return instance;
+    }
 
     public void startDownload(String songName) {
         startDownload(songName, false);

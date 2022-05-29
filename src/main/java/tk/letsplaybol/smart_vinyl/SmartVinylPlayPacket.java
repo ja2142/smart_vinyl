@@ -78,7 +78,7 @@ public class SmartVinylPlayPacket {
         String songName = message.songName;
         BlockPos position = message.pos;
 
-        YoutubeCache.cache.startDownload(songName);
+        YoutubeCache.getCache().startDownload(songName);
 
         ISound isound = (ISound) renderer.getPlayingRecords().get(position);
         if (isound != null) {

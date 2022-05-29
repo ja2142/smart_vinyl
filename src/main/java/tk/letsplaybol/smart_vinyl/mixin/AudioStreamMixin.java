@@ -49,7 +49,7 @@ public class AudioStreamMixin {
         CompletableFuture<IAudioStream> future = CompletableFuture
                 .supplyAsync(() -> {
                     try {
-                        return new AudioStreamVelvet(YoutubeCache.cache.getInputStream(songName), true);
+                        return new AudioStreamVelvet(YoutubeCache.getCache().getInputStream(songName), true);
                     } catch (InterruptedException | ExecutionException e) {
                         LOGGER.error("failed to get velvet stream for " + location, e);
                         return null;
