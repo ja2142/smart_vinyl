@@ -19,15 +19,16 @@ public class DynamicDiscItem extends Item {
 
     public DynamicDiscItem(Properties props) {
         super(props.stacksTo(1).tab(ItemGroup.TAB_MISC));
-		setRegistryName(name);
+        setRegistryName(name);
     }
 
-    public void playSound(BlockPos position, String songName){
-        SmartVinylPlayPacket.NETWORK_CHANNEL.send(PacketDistributor.ALL.noArg(), new SmartVinylPlayPacket(position, songName));
+    public void playSound(BlockPos position, String songName) {
+        SmartVinylPlayPacket.NETWORK_CHANNEL.send(PacketDistributor.ALL.noArg(),
+                new SmartVinylPlayPacket(position, songName));
     }
 
-    private String getRealDisplayName(ItemStack stack){
-        String nameInBrackets = stack.getDisplayName().getString();
+    private String getRealDisplayName(ItemStack stack) {
+        String nameInBrackets = stack.getDisplayName().getString().trim();
         return nameInBrackets.substring(1, nameInBrackets.length() - 1);
     }
 
@@ -36,10 +37,10 @@ public class DynamicDiscItem extends Item {
         World level = context.getLevel();
         BlockPos clickedPos = context.getClickedPos();
         BlockState usedOnBlockState = level.getBlockState(context.getClickedPos());
-        if (usedOnBlockState.is(Blocks.JUKEBOX) && !usedOnBlockState.getValue(JukeboxBlock.HAS_RECORD)){
-            if (!level.isClientSide()){
+        if (usedOnBlockState.is(Blocks.JUKEBOX) && !usedOnBlockState.getValue(JukeboxBlock.HAS_RECORD)) {
+            if (!level.isClientSide()) {
                 ItemStack recordStack = context.getItemInHand();
-                JukeboxBlock jukebox = (JukeboxBlock)usedOnBlockState.getBlock();
+                JukeboxBlock jukebox = (JukeboxBlock) usedOnBlockState.getBlock();
                 jukebox.setRecord(level, clickedPos, usedOnBlockState, recordStack);
 
                 playSound(clickedPos, getRealDisplayName(context.getItemInHand()));
