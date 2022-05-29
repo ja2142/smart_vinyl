@@ -3,6 +3,7 @@ package tk.letsplaybol.smart_vinyl;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -33,6 +34,14 @@ public class YoutubeCache {
             instance = new YoutubeCache();
         }
         return instance;
+    }
+
+    private YoutubeCache(){
+        try{
+            Files.createDirectories(ResourceLocationCoder.CACHE_PATH);
+        } catch(IOError | IOException e){
+            LOGGER.debug("couldn't create cache directory (possibly because it already exists)");
+        }
     }
 
     public void startDownload(String songName) {
