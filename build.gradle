@@ -142,6 +142,8 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.26'
 
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
