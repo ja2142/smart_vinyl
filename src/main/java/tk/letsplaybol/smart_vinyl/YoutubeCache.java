@@ -15,6 +15,7 @@ import com.zakgof.velvetvideo.ISeekableInput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import tk.letsplaybol.smart_vinyl.util.AsyncIOExecutorProvider;
 import tk.letsplaybol.smart_vinyl.util.ResourceLocationCoder;
 
 public class YoutubeCache {
@@ -36,10 +37,10 @@ public class YoutubeCache {
         return instance;
     }
 
-    private YoutubeCache(){
-        try{
+    private YoutubeCache() {
+        try {
             Files.createDirectories(ResourceLocationCoder.CACHE_PATH);
-        } catch(IOError | IOException e){
+        } catch (IOError | IOException e) {
             LOGGER.debug("couldn't create cache directory (possibly because it already exists)");
         }
     }
@@ -68,7 +69,7 @@ public class YoutubeCache {
                 LOGGER.error("lookup failed", e);
                 return null;
             }
-        }));
+        }, AsyncIOExecutorProvider.getExecutor()));
     }
 
     public ISeekableInput getInputStream(String songName) throws InterruptedException, ExecutionException {

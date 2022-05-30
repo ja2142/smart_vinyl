@@ -1,6 +1,5 @@
 package tk.letsplaybol.smart_vinyl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -14,6 +13,8 @@ import com.zakgof.velvetvideo.ISeekableInput;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import tk.letsplaybol.smart_vinyl.util.AsyncIOExecutorProvider;
 
 class FileBufferedInputStream implements ISeekableInput {
 
@@ -34,10 +35,11 @@ class FileBufferedInputStream implements ISeekableInput {
     public FileBufferedInputStream(Path backingFilePath) throws IOException {
         LOGGER.info("constructor " + backingFilePath);
 
-        this.size = (int)backingFilePath.toFile().length();
+        this.size = (int) backingFilePath.toFile().length();
         this.readBuffer = FileChannel.open(backingFilePath, StandardOpenOption.READ)
                 .map(MapMode.READ_ONLY, 0, size);
-        // writeBuffer in this case is not used for writing, it's just to emulate other mode of operation
+        // writeBuffer in this case is not used for writing, it's just to emulate other
+        // mode of operation
         this.writeBuffer = readBuffer.slice();
         // emulate already written file
         writeBuffer.position(size);
@@ -79,7 +81,7 @@ class FileBufferedInputStream implements ISeekableInput {
             } catch (IOException e) {
                 LOGGER.error("downloading failed for " + downloadName, e);
             }
-        });
+        }, AsyncIOExecutorProvider.getExecutor());
     }
 
     // This should be called on a separate producer thread

@@ -18,6 +18,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import tk.letsplaybol.smart_vinyl.util.AsyncIOExecutorProvider;
 import tk.letsplaybol.smart_vinyl.util.ResourceLocationCoder;
 
 public class YoutubeDl {
@@ -27,7 +28,8 @@ public class YoutubeDl {
 
     public static void getYoutubeDlBinary() {
         CompletableFuture.runAsync(
-                () -> downloadOrUpdateYoutubeDl());
+                () -> downloadOrUpdateYoutubeDl(),
+                AsyncIOExecutorProvider.getExecutor());
     }
 
     private static void downloadOrUpdateYoutubeDl() {
@@ -61,9 +63,9 @@ public class YoutubeDl {
     public static String runCommand(String... args) throws IOException {
         Process proc = Runtime.getRuntime().exec(args);
         String output = IOUtils.toString(proc.getInputStream(), StandardCharsets.UTF_8);
-        try{
+        try {
             proc.waitFor();
-        } catch(InterruptedException e){
+        } catch (InterruptedException e) {
             throw new IOException(e);
         }
         if (proc.exitValue() != 0) {
