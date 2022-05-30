@@ -18,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import tk.letsplaybol.smart_vinyl.AudioStreamVelvet;
 import tk.letsplaybol.smart_vinyl.SmartVinyl;
 import tk.letsplaybol.smart_vinyl.YoutubeCache;
+import tk.letsplaybol.smart_vinyl.util.AsyncIOExecutorProvider;
 import tk.letsplaybol.smart_vinyl.util.ResourceLocationCoder;
 
 @Mixin(AudioStreamManager.class)
@@ -54,7 +55,7 @@ public class AudioStreamMixin {
                         LOGGER.error("failed to get velvet stream for " + location, e);
                         return null;
                     }
-                });
+                }, AsyncIOExecutorProvider.getExecutor());
         callback_info.setReturnValue(future);
     }
 }
