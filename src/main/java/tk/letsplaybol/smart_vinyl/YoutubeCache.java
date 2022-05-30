@@ -25,7 +25,7 @@ public class YoutubeCache {
 
     private static final long MAX_CACHE_SIZE_BYTES = 128 * 1024 * 1024;
 
-    private CacheDb cacheDb = new CacheDb();
+    private CacheDb cacheDb;
 
     private Map<String, Future<FileBufferedInputStream>> startedLookups = new HashMap<>();
     private Map<String, FileBufferedInputStream> startedDownloads = new HashMap<>();
@@ -43,6 +43,7 @@ public class YoutubeCache {
         } catch (IOError | IOException e) {
             LOGGER.debug("couldn't create cache directory (possibly because it already exists)");
         }
+        cacheDb = new CacheDb();
     }
 
     public void startDownload(String songName) {
