@@ -1,0 +1,7 @@
+this is a modified velvet video, with following changes:
+    it prioritizes custom native library paths
+        (same as here https://github.com/zakgof/velvet-video/pull/36/commits/55d27f6630acdbf857b225334440eab72acf6525)
+    logging via slf4j was removed (logging is nice, but it was a major pain in the ass to get to work with forge,
+        just removing it was way easier)
+
+built from https://github.com/ja2142/velvet-video/tree/remove_logging
