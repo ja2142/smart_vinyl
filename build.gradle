@@ -10,9 +10,14 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
 repositories {
     mavenCentral()
 }
+
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
@@ -136,7 +141,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.26'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.34'
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
@@ -164,16 +169,17 @@ dependencies {
 
     shade files('dep/velvet-video-0.5.3-SNAPSHOT.jar')
     // files() is to be changed for something like below, if the velvet fix ever gets merged
-    //implementation "com.github.zakgof:velvet-video:0.5.2"
+    // shade "com.github.zakgof:velvet-video:0.5.2"
 
-    shade "com.github.zakgof:velvet-video-natives:0.2.8.full"
+    shade 'com.github.zakgof:velvet-video-natives:0.2.8.full'
 
     // dependencies for velvet-video (seems like they aren't considered when using 'implementation files()')
     // all this is to be removed (except slf4j-api? idk), once official velvet-video version can be used
     shade 'commons-io:commons-io:2.6'
-    shade "com.github.zakgof:tools:0.7.0"
+    shade 'com.github.zakgof:tools:0.7.0'
     shade 'com.github.jnr:jnr-ffi:2.2.12'
-    shade 'org.slf4j:slf4j-api:2.0.0-alpha0'
+    // shade 'org.slf4j:slf4j-api:2.0.3'
+    // shade 'org.slf4j:slf4j-simple:2.0.3'
 }
 
 mixin {
@@ -182,13 +188,7 @@ mixin {
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)) {
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            exclude 'META-INF', 'META-INF/**'
-        }
-    }
-
+    archiveClassifier = 'slim'
     manifest {
         attributes([
             "Specification-Title": "smart_vinyl",
@@ -205,6 +205,25 @@ jar {
     }
 }
 
+shadowJar {
+    archiveClassifier = ''
+    configurations = [project.configurations.shade]
+    
+    // relocate 'org.slf4j.slf4j-api', "${project.group}.relocated.org.slf4j.slf4j-api"
+    // relocate 'org.slf4j.slf4j-simple', "${project.group}.relocated.org.slf4j.slf4j-simple"
+    relocate 'commons-io:commons-io', "${project.group}.relocated.commons-io:commons-io"
+    relocate 'com.github.zakgof.tools', "${project.group}.relocated.com.github.zakgof.tools"
+    relocate 'com.github.jnr.jnr-ffi', "${project.group}.relocated.com.github.jnr.jnr-ffi"
+    
+    finalizedBy 'reobfShadowJar'
+}
+
+assemble.dependsOn shadowJar
+
+reobf {
+    shadowJar {}
+}
+
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
 jar.finalizedBy('reobfJar')
@@ -215,6 +234,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
+            artifact shadowJar
         }
     }
     repositories {

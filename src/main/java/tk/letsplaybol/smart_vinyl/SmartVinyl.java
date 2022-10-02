@@ -2,6 +2,10 @@ package tk.letsplaybol.smart_vinyl;
 
 import java.util.stream.Collectors;
 
+import com.zakgof.velvetvideo.ISeekableInput;
+import com.zakgof.velvetvideo.VelvetVideoException;
+import com.zakgof.velvetvideo.impl.VelvetVideoLib;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,6 +50,36 @@ public class SmartVinyl {
         Configurator.setLevel("velvet-video", Level.INFO);
     }
 
+    public static void loadVelvetVideo() {
+        LOGGER.info("loading velvet-video");        
+        try {
+            VelvetVideoLib.getInstance().demuxer(new ISeekableInput() {
+
+                @Override
+                public void close() {
+                }
+
+                @Override
+                public int read(byte[] arg0) {
+                    return 0;
+                }
+
+                @Override
+                public void seek(long arg0) {
+                }
+
+                @Override
+                public long size() {
+                    return 0;
+                }
+            });
+        } catch (VelvetVideoException e) {
+            // failure is expected for empty stream, but at this point libraries should be
+            // extracted
+        }
+        LOGGER.info("done loading velvet-video");        
+    }
+
     private void setup(final FMLCommonSetupEvent event) {
         silenceVelvetVideo();
 
@@ -53,6 +87,7 @@ public class SmartVinyl {
         YoutubeDl.getYoutubeDlBinary();
 
         YoutubeCache.getCache().cleanup();
+        loadVelvetVideo();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {

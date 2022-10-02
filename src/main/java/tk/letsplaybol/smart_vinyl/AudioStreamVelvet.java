@@ -12,7 +12,6 @@ import com.zakgof.velvetvideo.IAudioDecoderStream;
 import com.zakgof.velvetvideo.IAudioFrame;
 import com.zakgof.velvetvideo.IDemuxer;
 import com.zakgof.velvetvideo.ISeekableInput;
-import com.zakgof.velvetvideo.IVelvetVideoLib;
 import com.zakgof.velvetvideo.impl.VelvetVideoLib;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,7 +21,6 @@ import net.minecraft.client.audio.IAudioStream;
 
 public class AudioStreamVelvet implements IAudioStream {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final IVelvetVideoLib velvetVideoLib = VelvetVideoLib.getInstance();
 
     private IDemuxer demuxer;
     private IAudioDecoderStream stream;
@@ -41,7 +39,7 @@ public class AudioStreamVelvet implements IAudioStream {
     }
 
     public AudioStreamVelvet(File file, boolean convertToMono) {
-        this(velvetVideoLib.demuxer(file), convertToMono);
+        this(VelvetVideoLib.getInstance().demuxer(file), convertToMono);
     }
 
     public AudioStreamVelvet(ISeekableInput input) {
@@ -49,7 +47,7 @@ public class AudioStreamVelvet implements IAudioStream {
     }
 
     public AudioStreamVelvet(ISeekableInput input, boolean convertToMono) {
-        this(velvetVideoLib.demuxer(input), convertToMono);
+        this(VelvetVideoLib.getInstance().demuxer(input), convertToMono);
     }
 
     private AudioStreamVelvet(IDemuxer demuxer, boolean convertToMono) {
@@ -197,10 +195,10 @@ public class AudioStreamVelvet implements IAudioStream {
             }
         }
         int resultLength = samples.length;
-        if (downsizingSamples){
+        if (downsizingSamples) {
             resultLength /= 2;
         }
-        if(monoingSamples){
+        if (monoingSamples) {
             resultLength /= 2;
         }
         return resultLength;
